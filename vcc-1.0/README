@@ -1,0 +1,73 @@
+README
+vcc version 1.0
+Author: Michael Tobin
+Last Updated 15 August 2003
+
+
+Overview
+
+vcc is a compiler for a simple derivative of the C language to target the VeSPA processor 
+architecture. The compiler itself is very simple, consisting of perhaps around 3,000 lines 
+of code and 10 modules. It is based on the compiler described in [1], though with many 
+enhancements to its functionality, such as arrays, for loops, and more.
+
+
+Installation and running
+
+Installation is pretty straightforward. First, unpackage the vcc-1.0.tar.gz file by 
+running the command...of course if you're reading this, you've already gotten this far...:
+
+	% gtar -xvzf vcc-1.0.tar.gz
+
+This will create several directories and files needed to build and run the compiler. Next, 
+in the vcc-1.0/src directory created by unpacking the file is a file called config.h, 
+which looks like (with some additional comments at the top):
+
+	#ifndef __CONFIG_INCLUDED__
+	#define __CONFIG_INCLUDED__
+
+	#define CPP     "/usr/local/bin/cpp"
+	#define VASM 	"../../vasm/vasm"
+
+	#endif
+
+The file comes with defaults as they were on my computer. You need to replace the paths 
+listed here with the correct paths to cpp, the C preprocessor, and vasm, the VeSPA 
+assembler. To locate cpp, simply run
+
+	which cpp
+
+and copy the file listed to the CPP macro. See your instructor about installing vasm. It is 
+easiest to use an absolute path for the VASM macro; it is the least ambiguous. However, 
+if you want to use relative paths, remember that it is relative to the vcc-1.0/src/ 
+directory, and not the parent directory vcc-1.0/.
+
+Finally, to finish installation, simply run the install script: 
+
+	% ./install
+
+This script builds the vcc compiler and installs the resulting binary in the vcc-1.0/ 
+directory.
+
+
+Additional installation notes
+
+If for some reason compilation doesn't work, you may have to edit the file Makefile in 
+vcc-1.0/src/. The only changes you should have to make are to the macro definitions 
+at the top. For instance if you don't have bison installed on your system but you have 
+yacc, simply change the macro YACC to be yacc:
+
+	YACC=yacc
+
+Also, feel free to change the CFLAGS macro for different compiling options. However, do 
+not remove the "-include boolean.h" option unless your compiler supports the 
+bool data type (which gcc, the default compiler, doesn't). Add the -g option to CFLAGS 
+to generate debugging information if you want to debug the compiler. Also, defining the 
+TRACE macro will run the compiler with much more verbose output. This is also more 
+for debugging purposes, so it's only really useful if you are modifying the compiler.
+
+Beyond these notes, feel free to change anything you want, but at your own risk. Of 
+course, it's always a good idea to back up anything before you change it.
+
+
+## Please see the included Documentation.pdf file for further instructions.

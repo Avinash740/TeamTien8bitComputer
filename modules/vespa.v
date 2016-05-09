@@ -248,6 +248,7 @@ module vespa;
 
 				default : begin
 					$display("Error: undefined opcode: %d", `OPCODE);
+					RUN = 0;
 				end
 
 			endcase
@@ -356,31 +357,31 @@ module vespa;
 					checkcc = (~N & ~V) | (N & V);
 				end
 
-
 				`BLT:begin
 					checkcc = (N & ~V) | (~N & V);
 				end
-
 
 				`BGT:begin
 					checkcc = ~Z & ( (~N & ~V) | (N & V) );
 				end
 
-
 				`BLE:begin
 					checkcc = Z | ( (N & ~V) | (~N & V) );
 				end
-
 
 				`BPL:begin
 					checkcc = ~N;
 				end
 
-
 				`BMI:begin
 					checkcc = N;
 				end
-			
+				
+				default:begin
+					$display("Error: undefined Branch Condition: %d", `COND);
+					RUN = 0;
+				end
+
 			endcase // COND
 		end
 	endfunction 	// checkcc
@@ -405,7 +406,7 @@ module vespa;
 
 			`ifdef TRACE_IR
 			begin
-				$display("Instruction Register:%b",IR);
+				$display("Instruction Register:	%b",IR);
 			end
 			`endif 	//TRACE_IR
 
