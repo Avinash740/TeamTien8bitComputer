@@ -122,6 +122,8 @@ module vespa;
 	end
 
 	// Task and function definitions
+
+	// Fetch Decodes OPCode 
 	task fetch;
 		begin 
 			IR = read_mem(PC);
