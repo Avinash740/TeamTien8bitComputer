@@ -4,7 +4,7 @@
 
 ### Architecture
 
-	2^13 x 8bit wide memory, 32 x 8bit wide instructions, 4 condition bits.
+	2^13 x 8bit wide memory, 32 x 8bit wide instructions, 4 condition bits, C,V,N,Z.
 
 ### Define OPcode and condition codes
 	
@@ -16,7 +16,7 @@
 	NOT		0x5 	Bit-wise logical complement		
 	XOR 	0x6		Bit-wise logical XOR	
 	CMP		0x7		Arithmetic comparison (Logically a subtract, 
-					but it sets the condition bits only)
+					but it sets the condition bits)
 
 	BXX 	0x8 	Branch on Conditional
 	JMP		0x9		Jump indirectly, through a register + offset
@@ -33,20 +33,26 @@
 
 ### Define Branch Conditions
 
-	BRA 	0000 	BRanch Always
-	BNV 	1000	Branch NeVer
-	BCC 	0001	Branch on Carry Clear
-	BCS 	1001	Branch on Carry Set
-	BVC 	0010	Branch on (V)Overflow Clear
-	BVS 	1010	Branch on (V)Overflow Set
-	BEQ 	0011	Branch on EQual
-	BNE		1011	Branch on Not Equal
-	BGE 	0100	Branch on Greater than or Equal
-	BLT		1100	Branch on Less Than
-	BGT 	0101	Branch on Greater Than
-	BLE 	1101	Branch on Less than or Equal
-	BPL 	0110	Branch on positive (PLus)
-	BMI 	1110	Branch on negative (MInus)
+		C = Carry Flag - Set if a carry out has occurred from the MSB of an unsigned operation.
+		V = Overflow Flag - Set if result produces a 2's complement arithmetic overflow.
+		N = Negative Flag - Set if the result is negative.
+		Z = Zero Flag - Set if result is all 0's; arithmetic value of result == 0.
+
+	Condition 	(checkcc)			Assembly	COND 	Conditional Branch
+	1									BRA 	0000 	BRanch Always
+	0									BNV 	1000	Branch NeVer
+	~C									BCC 	0001	Branch on Carry Clear
+	C									BCS 	1001	Branch on Carry Set
+	~V									BVC 	0010	Branch on (V)Overflow Clear
+	V									BVS 	1010	Branch on (V)Overflow Set
+	Z									BEQ 	0011	Branch on EQual
+	~Z									BNE		1011	Branch on Not Equal
+	(~N & ~V) | (N & V)					BGE 	0100	Branch on Greater than or Equal
+	(N & ~V) | (~N & V)					BLT		1100	Branch on Less Than
+	~Z & ((~N & ~V) | (N & V))			BGT 	0101	Branch on Greater Than
+	Z | ((N & ~V) | (~N & V))			BLE 	1101	Branch on Less than or Equal
+	~N									BPL 	0110	Branch on positive (PLus)
+	N									BMI 	1110	Branch on negative (MInus)
 
 ## Compiling Code
 The verilog simulation is already compiled in the demo folder, but to recompile it, run the command
