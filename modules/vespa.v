@@ -403,7 +403,7 @@ module vespa;
 			end
 			`endif 	//TRACE_CC
 
-			`ifdef  //TRACE_IR
+			`ifdef  TRACE_IR
 			begin
 				$display("Instruction Register:%b",IR);
 			`endif 	//TRACE_IR
