@@ -1,0 +1,16 @@
+testfiles
+
+This directory contains a number of example C files that demonstrate various
+aspects of the compiler.  It's probably best to run them with the -at options so
+you can examine their output.  Also running with the -o option is helpful so you
+can save individual assembly files.  e.g. to compile qsort.c, run this command:
+
+	% vcc -t -o qsort.asm qsort.c
+
+This creates the qsort.asm file which is the final assembly program, and v.tmp,
+which is an intermediate file, probably easier to read than qsort.asm--it's 
+commented.
+
+Michael Tobin
+15 August 2003
+

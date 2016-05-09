@@ -1,0 +1,17 @@
+
+
+This directory contains all of the files necessary to compile
+the VASM assembler.
+
+Type 'make vasm' to compile the object file.
+
+After compiling vasm, the command
+
+	vasm file.asm
+
+will read the VeSPA assembly language file file.asm.  It will produce
+the file v.out, which can be read by the Verilog simulator that you
+have simulating your VeSPA processor model.
+
+
+
