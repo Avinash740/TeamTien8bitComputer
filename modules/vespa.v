@@ -4,6 +4,7 @@ module vespa;
 	`define TRACE_PC 1
 	`define TRACE_CC 1
 	`define TRACE_REGS 1
+	`define TRACE_IR 1
 
 	// Declare global parameters
 	parameter WIDTH = 32; 			// Datapath Width
@@ -11,10 +12,11 @@ module vespa;
 	parameter MEMSIZE = (1 << 13);	// Size of simulated memory. Address range (0, 2^13 - 1)
 
 	integer num_instrs;
+	integer i;
 
 	// Declare storage elements in ISA
-	reg [7:0]		MEM[MEMSIZE-1:0];		// Byte-wide main memory
-	reg [WIDTH-1:0]	R[NUMREGS-1:0]; 		// General-Purpose Registers
+	reg [7:0]		MEM[MEMSIZE-1:0];
+	reg [WIDTH-1:0]	R[NUMREGS-1:0];
 	reg [WIDTH-1:0]	PC;		 				// Program Counter
 	reg [WIDTH-1:0] IR;						// Instruction Register
 	reg 			C;	 					// Carry Flag - Set if a carry out has occurred from the MSB of an unsigned operation.
@@ -89,6 +91,16 @@ module vespa;
 
 	// Main fetch-execute loop
 	initial begin 
+
+		for (i = 0; i < MEMSIZE; i = i + 1) 
+			begin
+				MEM[i]= 8'hF;		// Byte-wide main memory
+		end
+		for (i = 0; i < NUMREGS; i = i + 1)
+			begin
+				R[i] = 8'h0; 		// General-Purpose Registers
+		end
+
 
 		$readmemh("v.out",MEM);
 
@@ -390,6 +402,11 @@ module vespa;
 				$display("Condition codes: C=%b V=%b Z=%d N=%b", C,V,Z,N);
 			end
 			`endif 	//TRACE_CC
+
+			`ifdef  //TRACE_IR
+			begin
+				$display("Instruction Register:%b",IR);
+			`endif 	//TRACE_IR
 
 			`ifdef TRACE_REGS
 			begin
