@@ -2,6 +2,10 @@
 
 ## Defining the VeSPA ISA 
 
+### Architecture
+
+	2^13 x 8bit wide memory, 32 x 8bit wide instructions, 4 condition bits.
+
 ### Define OPcode and condition codes
 	
 	NOP 	0x0
@@ -44,6 +48,21 @@
 	BMI 	1110
 
 ## Running Code
-	The verilog simulation is already compiled in the demo folder.
-	To run a compiled VeSPA program, rename the binary to 'v.out' in the demo folder.
+	The verilog simulation is already compiled in the demo folder, but to recompile it, run the command
+
+		iverilog -o vespa vespa.v
+
+	vespa is the compiled verilog simulation.
+
+	To run a compiled VeSPA program, rename the binary you want to run to 'v.out' in the demo folder.
+		Then, run the command
+
+		vvp vespa
+
+	A trace of the status of the instruction count, values of PC, IR, Condition Codes, OPCODE of instruction, and the status of the 32 registers in reg_file.
+
+	To compile code, run the command
 	
+		vcc your_Program.c 
+	
+	which generates v.out, a hex representation of the compiled program.
