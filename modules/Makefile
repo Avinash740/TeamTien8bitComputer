@@ -1,1 +1,0 @@
-make CPU=x86 SYNTAX=std

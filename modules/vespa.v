@@ -57,7 +57,9 @@ module vespa;
 	`define STX 	5'hE
 	`define HLT		5'd31
 
-	//Define Branch Conditions
+	/*--------------------------------------*/
+	//Define Branch Conditions				//
+	/*--------------------------------------*/
 	`define BRA 	4'b0000
 	`define BNV 	4'b1000
 	`define BCC 	4'b0001
@@ -73,23 +75,33 @@ module vespa;
 	`define BPL 	4'b0110
 	`define BMI 	4'b1110
 
-	// Define fields in instruction format
+
+	/*--------------------------------------*/
+	// Define fields in instruction format	//
+	/*--------------------------------------*/
+
 	`define OPCODE 	IR [31:27]		// opcode field
 	`define rdst	IR [26:22]		// flag
 	`define rs1		IR [21:17]		// source register 1
 	`define IMM_OP	IR [16]			// IR[16] == 1 when source 2 is immediate operand
 	`define rs2		IR [15:11]		// source register 2
 	`define rst 	IR [26:22]		// source register for store op
+	
 	`define immed23	IR [22:0]		// 23-bit literal field
 	`define immed22	IR [21:0]		// 23-bit literal field
 	`define immed17	IR [16:0]		// 17-bit literal field
 	`define immed16	IR [15:0]		// 16-bit literal field
+
 	`define COND 	IR [26:23]		// Branch Conditions
 
 
 	`define operand	IR [3:0]		// operand field
+	
 
-	// Main fetch-execute loop
+	/*--------------------------------------*/
+	// Main fetch-execute loop				//
+	/*--------------------------------------*/
+
 	initial begin 
 
 		for (i = 0; i < MEMSIZE; i = i + 1) 
@@ -121,8 +133,11 @@ module vespa;
 		$finish;	// Terminate simulation and exit
 	end
 
-	// Task and function definitions
 
+	/*--------------------------------------*/
+	// Task and function definitions		//
+	/*--------------------------------------*/
+	
 	// Fetch Decodes OPCode 
 	task fetch;
 		begin 
@@ -193,13 +208,14 @@ module vespa;
 				end
 
 				`JMP: begin
-					if (`IMM_OP == 1)		// If JAL-ing, tho old PC must be saved before it is lost
-						R [`rdst] = PC;		// Linking not automatic
+					if (`IMM_OP == 1)		// If JAL-ing, PC should be stored 
+											// 		into a register somewhere;
+						PC = R [`rdst] ;	// Linking not automatic
 					PC = R [`rs1] + sext16(`immed16);
 				end
 
 				`LD: begin
-					R[`rdst] = read_mem (sext22(`immed22));
+					R[`rdst] = read_mem(sext22(`immed22));
 				end
 
 				`LDI: begin
@@ -258,8 +274,9 @@ module vespa;
 		end
 	endtask
 
-
-	// Utility operations and functions
+	/*--------------------------------------*/
+	// Utility operations and functions		//
+	/*--------------------------------------*/
 
 	function [WIDTH-1:0] sext16; 	// 16 bit input
 		input [15:0] d_in;			// bit field to be sign-extended

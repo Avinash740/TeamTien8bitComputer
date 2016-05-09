@@ -73,5 +73,5 @@ Then, run the command
 	
 	vvp vespa
 
-A trace of the status of the instruction count, values of PC, IR, Condition Codes, OPCODE of instruction, and the status of the 32 registers in reg_file.
+A trace of the status of the instruction count, values of PC, IR, Condition Codes, OPCODE of instruction, and the status of the 32 registers in reg_file are printed out by vvp
 
