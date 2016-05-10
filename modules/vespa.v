@@ -216,29 +216,14 @@ module vespa;
 
 				`LD: begin
 					R[`rdst] = read_mem(sext22(`immed22));
-					if ((|R[`rdst]) == x)
-						begin
-							$display("Error: Memory Out of Bounds: Terminating Program");
-							RUN = 0;
-						end
 				end
 
 				`LDI: begin
 					R[`rdst] = sext22(`immed22);
-					if ((|R[`rdst]) == x)
-						begin
-							$display("Error: Memory Out of Bounds: Terminating Program");
-							RUN = 0;
-						end
 				end
 
 				`LDX: begin
 					R[`rdst] = read_mem(R[`rs1] + sext17(`immed17));
-					if ((|R[`rdst]) == x)
-						begin
-							$display("Error: Memory Out of Bounds: Terminating Program");
-							RUN = 0;
-						end
 				end
 
 				`NOP: begin
