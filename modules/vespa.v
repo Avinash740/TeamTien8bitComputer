@@ -9,7 +9,7 @@ module vespa;
 	// Declare global parameters
 	parameter WIDTH = 32; 			// Datapath Width
 	parameter NUMREGS = 32;			// Number of registers in ISA
-	parameter MEMSIZE = (1 << 13);	// Size of simulated memory. Address range (0, 2^13 - 1)
+	parameter MEMSIZE = (1 << 13);	// Size of simulated memory. Address range (0, 2^32 - 1)
 
 	integer num_instrs;
 	integer i;
@@ -117,7 +117,7 @@ module vespa;
 		$readmemh("v.out",MEM);
 
 		RUN = 1; 
-		PC = 0;
+		PC = 8'd0;
 		num_instrs = 0;
 
 		while(RUN == 1)
@@ -138,8 +138,8 @@ module vespa;
 	// Task and function definitions		//
 	/*--------------------------------------*/
 	
-	// Fetch Decodes OPCode 
-	task fetch;
+	// Fetch Decodes OPCode
+ 	task fetch;
 		begin 
 			IR = read_mem(PC);
 			PC = PC+4;
@@ -200,7 +200,7 @@ module vespa;
 
 				`BXX: begin
 					if (checkcc(Z,C,N,V) == 1)
-						PC = PC + sext23(`immed16);
+						PC = PC + sext23(`immed23);
 				end
 
 				`HLT: begin
@@ -208,8 +208,7 @@ module vespa;
 				end
 
 				`JMP: begin
-					if (`IMM_OP == 1)		// If JAL-ing, PC should be stored 
-											// 		into a register somewhere;
+					if (`IMM_OP == 1)		// If JAL-ing, PC should be stored into a register somewhere;
 						PC = R [`rdst] ;	// Linking not automatic
 					PC = R [`rs1] + sext16(`immed16);
 				end
@@ -296,18 +295,18 @@ module vespa;
 	endfunction
 
 	function [WIDTH-1:0] sext17; 	// 17 bit input
-		input [15:0] d_in;			// bit field to be sign-extended
-		sext17[WIDTH-1:0] = { {(WIDTH-17){d_in[15]}} , d_in };
+		input [16:0] d_in;			// bit field to be sign-extended
+		sext17[WIDTH-1:0] = { {(WIDTH-17){d_in[16]}} , d_in };
 	endfunction
 
 	function [WIDTH-1:0] sext22; 	// 22 bit input
-		input [15:0] d_in;			// bit field to be sign-extended
-		sext22[WIDTH-1:0] = { {(WIDTH-22){d_in[15]}} , d_in };
+		input [21:0] d_in;			// bit field to be sign-extended
+		sext22[WIDTH-1:0] = { {(WIDTH-22){d_in[22]}} , d_in };
 	endfunction
 
 	function [WIDTH-1:0] sext23; 	// 23 bit input
-		input [15:0] d_in;			// bit field to be sign-extended
-		sext23[WIDTH-1:0] = { {(WIDTH-23){d_in[15]}} , d_in };
+		input [22:0] d_in;			// bit field to be sign-extended
+		sext23[WIDTH-1:0] = { {(WIDTH-23){d_in[22]}} , d_in };
 	endfunction
 
 	task write_mem;

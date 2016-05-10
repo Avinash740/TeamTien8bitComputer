@@ -4,13 +4,15 @@
 
 ### Architecture
 
-	2^13 x 8bit wide memory, 32 x 8bit wide instructions, 4 condition bits, C,V,N,Z.
+	2^13 x 8bit wide memory, 32 x 8bit wide registers, 4 condition bits, C,V,N,Z.
 
 ### Define OPcode and condition codes
 	
 	NOP 	0x0		No operation
 	ADD		0x1		Addition
 	SUB 	0x2 	Subtraction
+
+	
 	OR 		0x3 	Bit-wise logical OR
 	AND		0x4		Bit-wise logical AND		
 	NOT		0x5 	Bit-wise logical complement		
@@ -74,4 +76,3 @@ Then, run the command
 	vvp vespa
 
 A trace of the status of the instruction count, values of PC, IR, Condition Codes, OPCODE of instruction, and the status of the 32 registers in reg_file are printed out by vvp
-
