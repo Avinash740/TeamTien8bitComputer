@@ -215,6 +215,12 @@ module vespa;
 				end
 
 				`LD: begin
+//				if (read_mem(sext22(`immed22)) == 'hFF) === x)	
+//					begin
+//						$display("Error: undefined opcode: %d", `OPCODE);
+//						RUN = 0;
+//					end
+//				else
 					R[`rdst] = read_mem(sext22(`immed22));
 				end
 
@@ -223,6 +229,12 @@ module vespa;
 				end
 
 				`LDX: begin
+//				if ((read_mem(R[`rs1] + sext17(`immed17)) == 'hFF) === x)	
+//					begin
+//						$display("Error: undefined opcode: %d", `OPCODE);
+//						RUN = 0;
+//					end
+//				else
 					R[`rdst] = read_mem(R[`rs1] + sext17(`immed17));
 				end
 
