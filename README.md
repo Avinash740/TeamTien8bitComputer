@@ -4,9 +4,9 @@
 
 ### Architecture
 
-	2^13 x 8bit wide memory, 32 x 8bit wide registers, 4 condition bits, C,V,N,Z.
+	2^32 x 8bit wide memory, 32 x 8bit wide registers, 4 condition bits, C,V,N,Z.
 
-### Define OPcode and condition codes
+### OPcodes
 	
 	NOP 	0x0		No operation
 	ADD		0x1		Addition
@@ -33,7 +33,7 @@
 	HLT		0x1		Halt Execution
 
 
-### Define Branch Conditions
+### Branch Conditions
 
 		C = Carry Flag - Set if a carry out has occurred from the MSB of an unsigned operation.
 		V = Overflow Flag - Set if result produces a 2's complement arithmetic overflow.
@@ -55,6 +55,111 @@
 	Z | ((N & ~V) | (~N & V))			BLE 	1101	Branch on Less than or Equal
 	~N									BPL 	0110	Branch on positive (PLus)
 	N									BMI 	1110	Branch on negative (MInus)
+
+### Instruction Format
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-yw4l{vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-yw4l"></th>
+    <th class="tg-baqh">31-27</th>
+    <th class="tg-baqh">26-23</th>
+    <th class="tg-baqh">22</th>
+    <th class="tg-baqh">21-17</th>
+    <th class="tg-baqh">16</th>
+    <th class="tg-baqh">15-11</th>
+    <th class="tg-baqh">10-0<br></th>
+  </tr>
+  <tr>
+    <td class="tg-baqh">ADD, AND, OR, SUB, XOR<br>(register to register)</td>
+    <td class="tg-s6z2" rowspan="13">opcode</td>
+    <td class="tg-baqh" colspan="2">rdst</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh">0</td>
+    <td class="tg-baqh">rs2</td>
+    <td class="tg-baqh">0...0</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">ADD, AND, OR, SUB, XOR<br>(immediate operand)</td>
+    <td class="tg-baqh" colspan="2">rdst</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh" colspan="2">immed16</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">CMP (register to register)</td>
+    <td class="tg-baqh" colspan="2">0...0</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh">0</td>
+    <td class="tg-baqh">rs2</td>
+    <td class="tg-yw4l">0...0</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">CMP (immediate operand)</td>
+    <td class="tg-baqh" colspan="2">0...0</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh" colspan="2">immed16</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Bxx</td>
+    <td class="tg-baqh">Condition Bits</td>
+    <td class="tg-baqh" colspan="5">immed23</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">HALT, NOP</td>
+    <td class="tg-baqh" colspan="6">0...0</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">JMP</td>
+    <td class="tg-baqh" colspan="2">0...0</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh">0</td>
+    <td class="tg-yw4l" colspan="2">immed16<br></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">JMPL</td>
+    <td class="tg-baqh" colspan="2">rdst</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yw4l" colspan="2">immed16</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">LD, LDI</td>
+    <td class="tg-baqh" colspan="2">rdst</td>
+    <td class="tg-baqh" colspan="4">immed22<br></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">LDX</td>
+    <td class="tg-baqh" colspan="2">rdst</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh" colspan="3">immed17</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">NOT</td>
+    <td class="tg-baqh" colspan="2">rdst</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh" colspan="3">0...0</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">ST</td>
+    <td class="tg-baqh" colspan="2">rst</td>
+    <td class="tg-baqh" colspan="4">immed22</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">STX</td>
+    <td class="tg-baqh" colspan="2">rst</td>
+    <td class="tg-baqh">rs1</td>
+    <td class="tg-baqh" colspan="3">immed17<br></td>
+  </tr>
+</table>
 
 ## Compiling Code
 The verilog simulation is already compiled in the demo folder, but to recompile it, run the command
