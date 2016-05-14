@@ -9,14 +9,14 @@ module vespa;
 	// Declare global parameters
 	parameter WIDTH = 32; 			// Datapath Width
 	parameter NUMREGS = 32;			// Number of registers in ISA
-	parameter MEMSIZE = (1 << 13);	// Size of simulated memory. Address range (0, 2^32 - 1)
+	parameter MEMSIZE = (1<<29);	// Size of simulated memory. Address range (0, 2^32 - 1)
 
 	integer num_instrs;
 	integer i;
 
 	// Declare storage elements in ISA
-	reg [7:0]		MEM[MEMSIZE-1:0];
-	reg [WIDTH-1:0]	R[NUMREGS-1:0];
+	reg [7:0]		MEM[0:MEMSIZE-1];
+	reg [WIDTH-1:0]	R[0:NUMREGS-1];
 	reg [WIDTH-1:0]	PC;		 				// Program Counter
 	reg [WIDTH-1:0] IR;						// Instruction Register
 	reg 			C;	 					// Carry Flag - Set if a carry out has occurred from the MSB of an unsigned operation.
@@ -41,20 +41,20 @@ module vespa;
 	// Define OPcode and condition codes
 	`define NOP 	5'd0
 	`define ADD		5'd1
-	`define SUB 	5'h2 	
-	`define OR 		5'h3 
-	`define AND		5'h4
-	`define NOT		5'h5 	
-	`define XOR 	5'h6		
-	`define CMP		5'h7		
-	`define BXX 	5'h8 	
-	`define JMP		5'h9
-	`define JMPL	5'h9		
-	`define LD 		5'hA	
-	`define LDI		5'hB
-	`define LDX 	5'hC
-	`define ST 		5'hD
-	`define STX 	5'hE
+	`define SUB 	5'd2 	
+	`define OR 		5'd3 
+	`define AND		5'd4
+	`define NOT		5'd5 	
+	`define XOR 	5'd6		
+	`define CMP		5'd7		
+	`define BXX 	5'd8 	
+	`define JMP		5'd9
+	`define JMPL	5'd9		
+	`define LD 		5'd10	
+	`define LDI		5'd11
+	`define LDX 	5'd12
+	`define ST 		5'd13
+	`define STX 	5'd14
 	`define HLT		5'd31
 
 	/*--------------------------------------*/
@@ -92,11 +92,7 @@ module vespa;
 	`define immed17	IR [16:0]		// 17-bit literal field
 	`define immed16	IR [15:0]		// 16-bit literal field
 
-	`define COND 	IR [26:23]		// Branch Conditions
-
-
-	`define operand	IR [3:0]		// operand field
-	
+	`define COND 	IR [26:23]		// Branch Conditions 
 
 	/*--------------------------------------*/
 	// Main fetch-execute loop				//
@@ -104,27 +100,19 @@ module vespa;
 
 	initial begin 
 
-		for (i = 0; i < MEMSIZE; i = i + 1) 
-			begin
-				MEM[i]= 8'hF;		// Byte-wide main memory
-		end
-		for (i = 0; i < NUMREGS; i = i + 1)
-			begin
-				R[i] = 8'h0; 		// General-Purpose Registers
-		end
-
-
-		$readmemh("v.out",MEM);
+		$readmemb("v.out",MEM,0,MEMSIZE);
 
 		RUN = 1; 
-		PC = 8'd0;
+		PC = 0;
 		num_instrs = 0;
 
 		while(RUN == 1)
 			begin 
 				num_instrs = num_instrs + 1 ;	// Number of instruction executed
 				fetch; 							// Fetch the next instruction
+	$display("fetch executed \n");
 				execute;						// Execute instruction in IR
+	$display("execute executed \n");
 				print_trace;					// print a trace of execution if enabled
 
 			end
@@ -142,7 +130,7 @@ module vespa;
  	task fetch;
 		begin 
 			IR = read_mem(PC);
-			PC = PC+4;
+			PC = PC + 4;
 		end
 	endtask
 
@@ -154,9 +142,11 @@ module vespa;
 
 	task execute;
 		begin
-
 			case (`OPCODE)
 				
+				`NOP: begin
+				end
+
 				`ADD: begin
 					if (`IMM_OP == 0)
 						op2 = R[`rs2];
@@ -167,6 +157,27 @@ module vespa;
 					R[`rdst] = result [WIDTH-1:0];
 					setcc(op1, op2,result,0);
 				end
+				
+				`SUB: begin
+					if (`IMM_OP == 0)
+						op2 = R[`rs2];
+					else
+						op2 = sext16(`immed16);
+					op1 = R[`rs1];
+					result = op1 - op2;
+					R[`rdst] = result [WIDTH-1:0];
+					setcc(op1, op2, result, 1);
+				end
+
+				`OR:begin
+					if(`IMM_OP == 0)
+						op2 = R[`rs2];
+					else
+						op2 = sext16(`immed16);
+					op1 = R[`rs1];
+					result = op1 | op2;
+					R[`rdst] = result [WIDTH-1:0];
+				end
 
 				`AND: begin
 					if (`IMM_OP == 0)
@@ -176,6 +187,12 @@ module vespa;
 					op1 = R[`rs1];
 					result = op1 & op2;
 					R[`rdst] = result [WIDTH-1:0];
+				end
+
+				`NOT: begin
+					op1 = R[`rs1];
+					result = ~op1;
+					R[`rdst] = result[WIDTH-1:0];
 				end
 
 				`XOR: begin
@@ -200,26 +217,16 @@ module vespa;
 
 				`BXX: begin
 					if (checkcc(Z,C,N,V) == 1)
-						PC = PC + sext23(`immed23);
-				end
-
-				`HLT: begin
-					RUN = 0;
+						PC = sext23(`immed23); 
 				end
 
 				`JMP: begin
-					if (`IMM_OP == 1)		// If JAL-ing, PC should be stored into a register somewhere;
-						PC = R [`rdst] ;	// Linking not automatic
+					if (`IMM_OP == 1)		// If JAL-ing, PC is stored into a register somewhere;
+						R [`rdst] = PC; 
 					PC = R [`rs1] + sext16(`immed16);
 				end
 
 				`LD: begin
-//				if (read_mem(sext22(`immed22)) == 'hFF) === x)	
-//					begin
-//						$display("Error: undefined opcode: %d", `OPCODE);
-//						RUN = 0;
-//					end
-//				else
 					R[`rdst] = read_mem(sext22(`immed22));
 				end
 
@@ -228,32 +235,7 @@ module vespa;
 				end
 
 				`LDX: begin
-//				if ((read_mem(R[`rs1] + sext17(`immed17)) == 'hFF) === x)	
-//					begin
-//						$display("Error: undefined opcode: %d", `OPCODE);
-//						RUN = 0;
-//					end
-//				else
 					R[`rdst] = read_mem(R[`rs1] + sext17(`immed17));
-				end
-
-				`NOP: begin
-				end
-
-				`NOT: begin
-					op1 = R[`rs1];
-					result = ~op1;
-					R[`rdst] = result[WIDTH-1:0];
-				end
-
-				`OR:begin
-					if(`IMM_OP == 0)
-						op2 = R[`rs2];
-					else
-						op2 = sext16(`immed16);
-					op1 = R[`rs1];
-					result = op1 | op2;
-					R[`rdst] = result [WIDTH-1:0];
 				end
 
 				`ST: begin
@@ -264,15 +246,8 @@ module vespa;
 					write_mem(R[`rs1] + sext17(`immed17), R[`rst]);
 				end
 
-				`SUB: begin
-					if (`IMM_OP == 0)
-						op2 = R[`rs2];
-					else
-						op2 = sext16(`immed16);
-					op1 = R[`rs1];
-					result = op1 - op2;
-					R[`rdst] = result [WIDTH-1:0];
-					setcc(op1, op2, result, 1);
+				`HLT: begin
+					RUN = 0;
 				end
 
 				default : begin
@@ -281,7 +256,6 @@ module vespa;
 				end
 
 			endcase
-
 		end
 	endtask
 
@@ -301,7 +275,7 @@ module vespa;
 
 	function [WIDTH-1:0] sext22; 	// 22 bit input
 		input [21:0] d_in;			// bit field to be sign-extended
-		sext22[WIDTH-1:0] = { {(WIDTH-22){d_in[22]}} , d_in };
+		sext22[WIDTH-1:0] = { {(WIDTH-22){d_in[21]}} , d_in };
 	endfunction
 
 	function [WIDTH-1:0] sext23; 	// 23 bit input
@@ -324,13 +298,13 @@ module vespa;
 		input [WIDTH-1:0] op1;			// Operand 1
 		input [WIDTH-1:0] op2;			// Operand 2
 		input [WIDTH  :0] result;		// Calculated Result Value
-		input subt;						// Checks if input was a subtraction. If set, sign bit of 
+		input subt;						// Checks if op was a subtraction. If set, sign bit of 
 										// 		op2 must be inverted to properly find V, overflow
 
 		begin
 			C = result[WIDTH];			// Carryout of the result
-			Z = ~(|result[WIDTH-1:0]);	// Zero if all bits are zero
-			N = result[WIDTH-1];		// Negative if MSB == 1
+			Z = ~(|result[WIDTH-1:0]);	// Z = 1 if all bits are zero
+			N = result[WIDTH-1];		// N = 1 if negative : if MSB == 1
 			V = 	(result[WIDTH-1] & ~op1[WIDTH-1] & ~op1[WIDTH-1] &~(subt^op2[WIDTH-1])) | 
 					(~result[WIDTH-1] & op1[WIDTH-1] & (subt^op2[WIDTH-1])) ;
 										//	Overflow occurs whenever the sign of the result is the 
@@ -448,7 +422,7 @@ module vespa;
 						$write("R[%d]:",k);
 						for(j = 0; j <= 3; j = j + 1)
 							begin
-								$write(" %h",R[k]);
+								$write(" %b",R[k]);
 								k=k+1;
 							end
 						$write("\n");
