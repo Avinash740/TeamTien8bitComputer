@@ -32,41 +32,9 @@
 	
 	HLT		0x1		Halt Execution
 
-
-### Branch Conditions
-
-		C = Carry Flag - Set if a carry out has occurred from the MSB of an unsigned operation.
-		V = Overflow Flag - Set if result produces a 2's complement arithmetic overflow.
-		N = Negative Flag - Set if the result is negative.
-		Z = Zero Flag - Set if result is all 0's; arithmetic value of result == 0.
-
-	Condition 	(checkcc)			Assembly	COND 	Conditional Branch
-	1									BRA 	0000 	BRanch Always
-	0									BNV 	1000	Branch NeVer
-	~C									BCC 	0001	Branch on Carry Clear
-	C									BCS 	1001	Branch on Carry Set
-	~V									BVC 	0010	Branch on (V)Overflow Clear
-	V									BVS 	1010	Branch on (V)Overflow Set
-	Z									BEQ 	0011	Branch on EQual
-	~Z									BNE		1011	Branch on Not Equal
-	(~N & ~V) | (N & V)					BGE 	0100	Branch on Greater than or Equal
-	(N & ~V) | (~N & V)					BLT		1100	Branch on Less Than
-	~Z & ((~N & ~V) | (N & V))			BGT 	0101	Branch on Greater Than
-	Z | ((N & ~V) | (~N & V))			BLE 	1101	Branch on Less than or Equal
-	~N									BPL 	0110	Branch on positive (PLus)
-	N									BMI 	1110	Branch on negative (MInus)
-
 ### Instruction Format
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg .tg-s6z2{text-align:center}
-.tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-yw4l{vertical-align:top}
-</style>
-<table class="tg">
+<table>
   <tr>
     <th class="tg-yw4l"></th>
     <th class="tg-baqh">31-27</th>
@@ -160,6 +128,30 @@
     <td class="tg-baqh" colspan="3">immed17<br></td>
   </tr>
 </table>
+
+### Branch Conditions
+
+	C = Carry Flag - Set if a carry out has occurred from the MSB of an unsigned operation.
+	V = Overflow Flag - Set if result produces a 2's complement arithmetic overflow.
+	N = Negative Flag - Set if the result is negative.
+	Z = Zero Flag - Set if result is all 0's.
+
+	Condition 	(checkcc)			Assembly	COND 	Conditional Branch
+	1									BRA 	0000 	BRanch Always
+	0									BNV 	1000	Branch NeVer
+	~C									BCC 	0001	Branch on Carry Clear
+	C									BCS 	1001	Branch on Carry Set
+	~V									BVC 	0010	Branch on (V)Overflow Clear
+	V									BVS 	1010	Branch on (V)Overflow Set
+	Z									BEQ 	0011	Branch on EQual
+	~Z									BNE		1011	Branch on Not Equal
+	(~N & ~V) | (N & V)					BGE 	0100	Branch on Greater than or Equal
+	(N & ~V) | (~N & V)					BLT		1100	Branch on Less Than
+	~Z & ((~N & ~V) | (N & V))			BGT 	0101	Branch on Greater Than
+	Z | ((N & ~V) | (~N & V))			BLE 	1101	Branch on Less than or Equal
+	~N									BPL 	0110	Branch on positive (PLus)
+	N									BMI 	1110	Branch on negative (MInus)
+
 
 ## Compiling Code
 The verilog simulation is already compiled in the demo folder, but to recompile it, run the command
