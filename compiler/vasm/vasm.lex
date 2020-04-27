@@ -113,8 +113,7 @@ R{digit}+	{	/* register, e.g. R24				*/
 
 
 
-%%
-/* start of programs section						*/
+					
 
 
 
